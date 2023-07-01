@@ -1,99 +1,122 @@
-function add(n1, n2){
-    let sum = n1+n2;
-    return sum;
-}
-
-
-function subtract(n1,n2){
-    let difference = n1-n2;
-    return difference
-}
-
-function multiply(n1,n2){
-    let sum = n1*n2;
-    return sum;
-}
-
-function divide(n1,n2){
-    let sum = n1/n2;
-    return sum;
-}
-
-//console.log(add([2,1]));
-//console.log(subtract([2,1]));
-//console.log(multiply([2,1]));
-//console.log(divide([5,2]));
-let number1, number2, operator;
-
-function operate(n1,n2, operator){
-    if (operator == 'plus') {
-        return add(n1,n2);
-    } else if (operator == 'minus'){
-        return subtract(n1,n2);
-    } else if (operator == 'multiply'){
-        return multiply(n1,n2);
-    } else if (operator == 'divide'){
-        return divide(n1,n2);
-    }
-}
-
-const number = document.querySelectorAll('.display-change');
+const number_buttons = document.querySelectorAll('.number');
+const buttons = document.querySelectorAll('.display-change');
 const display = document.querySelector('.display');
-const operator_class = document.querySelectorAll('.operator'); 
+const operators = document.querySelectorAll('.operator');
+function add(numbers){
+    let sum = numbers.reduce((partialSum, a) => partialSum + a, 0);
+    return sum;
+}
+
+function subtract(numbers){
+    var differences = [];
+
+    for (var i = 0; i < numbers.length; i++) {
+      for (var j = i + 1; j < numbers.length; j++) {
+        var diff = Math.abs(numbers[i] - numbers[j]);
+        differences.push(diff);
+      }
+    }
+  
+    return differences[0];
+}
+
+
+function multiply(numbers){
+    let product = numbers.reduce((partialProd, a) => partialProd * a, 1);
+    return product;
+}
+
+function divide(numbers){
+    var quotient = numbers[0];
+
+    for (var i = 1; i < numbers.length; i++) {
+      quotient /= numbers[i];
+    }
+  
+    return quotient;
+}
+
+
+//function operate(n1,n2, operator){
+//    if (operator == 'plus') {
+//        return add(n1,n2);
+//    } else if (operator == 'minus'){
+//        return subtract(n1,n2);
+//    } else if (operator == 'multiply'){
+//        return multiply(n1,n2);
+//    } else if (operator == 'divide'){
+//        return divide(n1,n2);
+//    }
+//}
+
+let numbers = [];
 let displayValue = '';
+let operatorCount = 0;
+let result = 0;
+let operatorUsed = false;
+let operator;
 
 let displayChange = (event) =>{
-    const clickedNumber = event.target.textContent;
-    if (clickedNumber == 'C'){
-        display.textContent = '';
+    const clickedButton = event.target.textContent;
+    
+    if (clickedButton == 'C' || clickedButton == 'AC'){
         displayValue = '';
+        display.textContent = displayValue;
+        numbers = [];
         return;
-    } else if (clickedNumber == 'AC'){
-        display.textContent = '';
-        displayValue = '';
-        return;
-    } else if (clickedNumber == '.'){
-        return;
-    }
-   // console.log('number');
-    displayValue += clickedNumber;
-    display.textContent = displayValue;
-    //console.log(displayValue);
-}
-let counter = 1;
-let result;
-let numberSubmit = (event) =>{
-    selected_operator = event.target.textContent;
-
-    if (counter == 1) {
-        number1 = parseInt(displayValue);
-        displayValue = '';
-        display.textContent = '';
-        counter++;
-    } else if (counter == 2){
-        number2 = parseInt(displayValue);
-        displayValue = '';
-        display.textContent = '';
-        if (selected_operator == '+'){
-            result = add(number1,number2);
-            number1 = result;
-            console.log(result);
-        } else if (selected_operator == '-'){
-            result = subtract(number1,number2);
-            number1 = result;
-            console.log(result);
-        } else if (selected_operator == '='){
-            console.log(result);
-        }
     }
     
+    displayValue += clickedButton;
+    display.textContent = displayValue;
 }
 
+let operatorClick = (event) =>{
+    const clickedOperator = event.target.textContent;
+    operator = clickedOperator;
+    operatorUsed = true;
+    displayValue = '';
+    display.textContent = displayValue;
+    if (operator == '='){
+        display.textContent = numbers[0];
+        numbers = [];
+        operatorUsed = false;
+    }
+} 
+let numberClick = (event) =>{
+    let result;
+    if (!operatorUsed){
+        numbers.push(parseInt(displayValue));
+        console.log(numbers);
+    } else {
+        numbers.push(parseInt(displayValue));
+        if (operator == '+'){
+            result = add(numbers);
+            console.log('sum is ' + result);
+        } else if (operator == '−'){
+            result = subtract(numbers);
+            console.log('diff is ' + result);
+        } else if (operator == '×'){
+            result = multiply(numbers);
+            console.log('product is ' + result);
+        } else if (operator == '÷'){
+            result = divide(numbers);
+            console.log('quotient is ' + result);
+        }
+        numbers[0] = result;
+        numbers.splice(1,1); 
+        console.log(numbers);
+    }
+}
 
-number.forEach((item) =>{
+buttons.forEach((item) => {
     item.addEventListener('click', displayChange);
+});
+
+operators.forEach((item) =>{
+    item.addEventListener('click', operatorClick);
+});
+
+number_buttons.forEach((item) => {
+    item.addEventListener('click', numberClick);
 })
 
-operator_class.forEach((item) =>{
-    item.addEventListener('click', numberSubmit)
-})
